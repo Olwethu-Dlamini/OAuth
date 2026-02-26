@@ -1,88 +1,107 @@
 // server.js
 // ─────────────────────────────────────────────────────────────
-// LINE 1-4: IMPORT DEPENDENCIES
+// IMPORT DEPENDENCIES
 // ─────────────────────────────────────────────────────────────
-const express = require('express');                 // Web framework for Node.js
-const { OAuth2Client } = require('google-auth-library'); // Official Google OAuth library
-const axios = require('axios');                     // HTTP client to call Google's People API
-const cors = require('cors');                       // Middleware to handle Cross-Origin requests
+const express = require('express');
+const { OAuth2Client } = require('google-auth-library');
+const axios = require('axios');
+const cors = require('cors');
+require('dotenv').config(); // load .env variables
 
 // ─────────────────────────────────────────────────────────────
-// LINE 6-7: INITIALIZE EXPRESS & CORS
+// INITIALIZE EXPRESS & SECURE CORS
 // ─────────────────────────────────────────────────────────────
-const app = express();                              // Create the Express application instance
-app.use(cors());                                    // Enable CORS for all origins (⚠️ see security note below)
+const app = express();
+app.use(cors({
+  origin: process.env.CLIENT_ORIGIN_URL,  // frontend URL
+  methods: ['GET', 'POST'],
+  credentials: true
+}));
 
 // ─────────────────────────────────────────────────────────────
-// LINE 9: SERVER PORT
+// ENV VARIABLES
 // ─────────────────────────────────────────────────────────────
-const PORT = 5000;                                  // Port the backend will listen on
+const PORT = process.env.PORT || 5000;
+const CLIENT_ID = process.env.CLIENT_ID;
+const CLIENT_SECRET = process.env.CLIENT_SECRET;
+const REDIRECT_URI = process.env.REDIRECT_URI;
 
 // ─────────────────────────────────────────────────────────────
-// LINE 11-14: LOAD ENVIRONMENT VARIABLES
-// ─────────────────────────────────────────────────────────────
-require('dotenv').config();                         // Load .env file into process.env
-const CLIENT_ID = process.env.CLIENT_ID;            // Google OAuth Client ID (from Cloud Console)
-const CLIENT_SECRET = process.env.CLIENT_SECRET;    // Google OAuth Client Secret (keep this private!)
-const REDIRECT_URI = process.env.REDIRECT_URI;      // Must match Google Cloud Console exactly
-
-// ─────────────────────────────────────────────────────────────
-// LINE 16: CREATE OAUTH2 CLIENT INSTANCE
+// OAUTH2 CLIENT
 // ─────────────────────────────────────────────────────────────
 const oauth2Client = new OAuth2Client(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
-// This object handles: generating auth URLs, exchanging codes for tokens, refreshing tokens
 
 // ─────────────────────────────────────────────────────────────
-// LINE 19-28: STEP 1 — REDIRECT USER TO GOOGLE LOGIN
+// REDIRECT TO GOOGLE LOGIN
 // ─────────────────────────────────────────────────────────────
 app.get('/auth/google', (req, res) => {
   const authUrl = oauth2Client.generateAuthUrl({
-    access_type: 'offline',   // Request refresh token for long-term access
-    scope: [                  // Permissions we're requesting from the user
-      'openid',               // OpenID Connect core scope
-      'email',                // User's email address
-      'profile',              // Basic profile info (name, picture)
-      'https://www.googleapis.com/auth/userinfo.profile',  // Explicit profile access
-      'https://www.googleapis.com/auth/userinfo.email'      // Explicit email access
+    access_type: 'offline',
+    scope: [
+      'openid',
+      'email',
+      'profile',
+      'https://www.googleapis.com/auth/userinfo.profile',
+      'https://www.googleapis.com/auth/userinfo.email'
     ]
   });
-  res.redirect(authUrl);  // Send user's browser to Google's login page
+  res.redirect(authUrl);
 });
-// 🔹 User clicks "Sign in" → Browser goes to /auth/google → User lands on Google login
 
 // ─────────────────────────────────────────────────────────────
-// LINE 31-50: STEP 2 — HANDLE GOOGLE CALLBACK
+// GOOGLE CALLBACK – now passing FULL user info
 // ─────────────────────────────────────────────────────────────
 app.get('/auth/google/callback', async (req, res) => {
-  const code = req.query.code;            // Google appends ?code=XXX to the redirect URL
-  if (!code) return res.send('No code received'); // Basic validation
+  const code = req.query.code;
+  if (!code) return res.status(400).send('No code received');
 
   try {
-    // Exchange the authorization code for access/refresh tokens
+    // Exchange code for tokens
     const { tokens } = await oauth2Client.getToken(code);
-    oauth2Client.setCredentials(tokens);  // Set tokens on the client for subsequent API calls
+    oauth2Client.setCredentials(tokens);
 
-    // Fetch extended user profile from Google People API
+    // Fetch full user info from Google
     const { data: user } = await axios.get(
-      'https://people.googleapis.com/v1/people/me?personFields=names,emailAddresses,photos,locales',
-      { headers: { Authorization: `Bearer ${tokens.access_token}` } } // Authenticate the request
+      'https://www.googleapis.com/oauth2/v2/userinfo',
+      { headers: { Authorization: `Bearer ${tokens.access_token}` } }
     );
 
-    // Return the raw user data as JSON to the browser
-    res.setHeader('Content-Type', 'application/json');
-    res.send(JSON.stringify(user, null, 2)); // Pretty-printed JSON response
+    // Pass the FULL user object (with all fields Google returns)
+    // We just rename a few keys for frontend consistency
+    const fullUserData = {
+      ...user,                    // ← keeps id, verified_email, given_name, family_name, etc.
+      FullName: user.name,        // map for UI
+      PhotoUrl: user.picture,     // map for UI
+      // you can keep or remove these aliases — they're only used by the card
+    };
 
+    const frontendUrl = process.env.CLIENT_ORIGIN_URL;
+    if (!frontendUrl) throw new Error('CLIENT_ORIGIN_URL not set in .env');
+
+    const encodedData = encodeURIComponent(JSON.stringify(fullUserData));
+    res.redirect(`${frontendUrl}/profile?userData=${encodedData}`);
   } catch (err) {
-    // Log error details (in production, use a proper logger)
-    console.error(err.response?.data || err);
-    res.send('Authentication error'); // Generic error to avoid leaking details
+    console.error('OAuth callback error:', err.response?.data || err.message || err);
+    const frontendUrl = process.env.CLIENT_ORIGIN_URL;
+    if (frontendUrl) {
+      res.redirect(`${frontendUrl}/login?error=Authentication failed`);
+    } else {
+      res.status(500).send('Authentication error. Please try again.');
+    }
   }
 });
-// 🔹 After user approves, Google redirects to /auth/google/callback?code=XXX
-// 🔹 Backend exchanges code → tokens → fetches profile → returns JSON
 
 // ─────────────────────────────────────────────────────────────
-// LINE 53: START THE SERVER
+// HEALTH CHECK
 // ─────────────────────────────────────────────────────────────
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-// Server is now listening. Visit http://localhost:5000/auth/google to start the flow.
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', message: 'Backend running' });
+});
+
+// ─────────────────────────────────────────────────────────────
+// START SERVER
+// ─────────────────────────────────────────────────────────────
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
+  console.log(`🔗 Health check: http://localhost:${PORT}/api/health`);
+});

@@ -1029,3 +1029,6 @@ C:\Users\olwethu\Desktop\OAuth\OAuthFrontend\obj\Debug\net8.0\OAuthFrontend.dll
 C:\Users\olwethu\Desktop\OAuth\OAuthFrontend\obj\Debug\net8.0\refint\OAuthFrontend.dll
 C:\Users\olwethu\Desktop\OAuth\OAuthFrontend\obj\Debug\net8.0\OAuthFrontend.pdb
 C:\Users\olwethu\Desktop\OAuth\OAuthFrontend\obj\Debug\net8.0\ref\OAuthFrontend.dll
+C:\Users\olwethu\Desktop\OAuth\OAuthFrontend\obj\Debug\net8.0\OAuthFrontend.sourcelink.json
+C:\Users\olwethu\Desktop\OAuth\OAuthFrontend\obj\Debug\net8.0\scopedcss\Pages\Login.razor.rz.scp.css
+C:\Users\olwethu\Desktop\OAuth\OAuthFrontend\obj\Debug\net8.0\scopedcss\Pages\Profile.razor.rz.scp.css

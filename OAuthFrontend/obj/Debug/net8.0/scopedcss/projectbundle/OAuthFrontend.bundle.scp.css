@@ -160,3 +160,181 @@ main[b-yffww9u7q5] {
         overflow-y: auto;
     }
 }
+/* /Pages/Login.razor.rz.scp.css */
+/* Login.razor.css */
+.login-container[b-160h0psm5x] {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+  padding: 1rem;
+}
+
+.login-card[b-160h0psm5x] {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 420px;
+  overflow: hidden;
+  border: 1px solid #e0e6ed;
+}
+
+.login-header[b-160h0psm5x] {
+  padding: 2rem 2rem 1rem;
+  text-align: center;
+  border-bottom: 1px solid #f0f4f8;
+}
+
+.google-logo[b-160h0psm5x] {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1rem;
+  display: block;
+}
+
+.login-header h2[b-160h0psm5x] {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.login-subtitle[b-160h0psm5x] {
+  margin: 0.5rem 0 0;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.login-body[b-160h0psm5x] {
+  padding: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.google-signin-button[b-160h0psm5x] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 300px;
+  padding: 0.875rem 1.5rem;
+  background: white;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  color: #3c4043;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.google-signin-button:hover[b-160h0psm5x] {
+  border-color: #d2e3fc;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  transform: translateY(-1px);
+}
+
+.google-signin-button:active[b-160h0psm5x] {
+  background: #f8f9fa;
+  transform: translateY(0);
+}
+
+.google-icon[b-160h0psm5x] {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.login-footer[b-160h0psm5x] {
+  padding: 1rem 2rem 2rem;
+  text-align: center;
+  color: #666;
+  font-size: 0.85rem;
+  border-top: 1px solid #f0f4f8;
+}
+
+.login-footer a[b-160h0psm5x] {
+  color: #1a73e8;
+  text-decoration: none;
+}
+
+.login-footer a:hover[b-160h0psm5x] {
+  text-decoration: underline;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .login-card[b-160h0psm5x] {
+    border-radius: 12px;
+  }
+  .login-header[b-160h0psm5x], .login-body[b-160h0psm5x], .login-footer[b-160h0psm5x] {
+    padding: 1.5rem;
+  }
+}
+/* /Pages/Profile.razor.rz.scp.css */
+.profile-page[b-hpd6a8zqyf] {
+  padding: 20px;
+}
+
+.profile-grid[b-hpd6a8zqyf] {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.profile-card[b-hpd6a8zqyf] {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+  padding: 20px;
+  width: 300px;
+  text-align: center;
+}
+
+.profile-photo[b-hpd6a8zqyf] {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #4285f4;
+  margin-bottom: 15px;
+}
+
+.profile-photo-placeholder[b-hpd6a8zqyf] {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: #e0e6ed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  margin: 0 auto 15px;
+  border: 3px solid #dadce0;
+}
+
+.json-viewer[b-hpd6a8zqyf] {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  border-radius: 8px;
+  padding: 20px;
+  font-family: 'Consolas', 'Monaco', monospace;
+  width: 400px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
+
+.error[b-hpd6a8zqyf] {
+  color: #d93025;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.loading[b-hpd6a8zqyf] {
+  text-align: center;
+  font-size: 1.1rem;
+}

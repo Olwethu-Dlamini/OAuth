@@ -1,0 +1,104 @@
+@page "/profile"
+@using System.Web
+@inject NavigationManager Navigation
+
+<div class="profile-page">
+  @if (userData != null)
+  {
+    <div class="profile-grid">
+
+      <!-- Left: Profile Card (UI stays exactly the same) -->
+      <div class="profile-card">
+        @if (!string.IsNullOrEmpty(PhotoUrl))
+        {
+          <img src="@PhotoUrl" alt="Profile" class="profile-photo" />
+        }
+        else
+        {
+          <div class="profile-photo-placeholder">👤</div>
+        }
+        <h2>@FullName</h2>
+        <p>@Email</p>
+        <p><strong>Locale:</strong> @Locale</p>
+        <p>Authenticated via: Google OAuth</p>
+      </div>
+
+      <!-- Right: Full raw JSON from Google -->
+      <div class="json-viewer">
+        <h3>Full Google User Info</h3>
+        <pre>@RawJson</pre>
+      </div>
+
+    </div>
+  }
+  else if (errorMessage != null)
+  {
+    <div class="error">@errorMessage</div>
+  }
+  else
+  {
+    <div class="loading">Loading profile...</div>
+  }
+</div>
+
+@code {
+    private GoogleUserInfo? userData;
+    private string? errorMessage;
+
+    // Properties used by the UI card (same as before)
+    private string? FullName => userData?.FullName ?? userData?.name;
+    private string? Email    => userData?.email;
+    private string? PhotoUrl => userData?.PhotoUrl ?? userData?.picture;
+    private string? Locale   => userData?.locale;
+
+    // This now shows the FULL Google response
+    private string RawJson =>
+        userData != null
+            ? System.Text.Json.JsonSerializer.Serialize(userData, new System.Text.Json.JsonSerializerOptions { WriteIndented = true })
+            : "";
+
+    protected override void OnInitialized()
+    {
+        try
+        {
+            var uri = new Uri(Navigation.Uri);
+            var query = HttpUtility.ParseQueryString(uri.Query);
+            var encodedData = query["userData"];
+
+            if (string.IsNullOrEmpty(encodedData))
+            {
+                errorMessage = "No user data received. Please sign in again.";
+                return;
+            }
+
+            var decoded = HttpUtility.UrlDecode(encodedData);
+            userData = System.Text.Json.JsonSerializer.Deserialize<GoogleUserInfo>(decoded);
+
+            if (userData == null)
+            {
+                errorMessage = "Failed to parse user data.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error loading profile: {ex.Message}";
+        }
+    }
+
+    // Model that can hold the full Google /userinfo response
+    public class GoogleUserInfo
+    {
+        public string? id { get; set; }
+        public string? email { get; set; }
+        public bool? verified_email { get; set; }
+        public string? name { get; set; }
+        public string? given_name { get; set; }
+        public string? family_name { get; set; }
+        public string? picture { get; set; }
+        public string? locale { get; set; }
+
+        // Extra fields used by UI (added for convenience)
+        public string? FullName { get; set; }
+        public string? PhotoUrl { get; set; }
+    }
+}
