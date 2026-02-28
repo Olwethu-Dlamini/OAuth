@@ -1,0 +1,19 @@
+services:
+  backend:
+    build:
+      context: ./node
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./node/.env
+
+  frontend:
+    build:
+      context: ./OAuthFrontend
+      dockerfile: Dockerfile
+    ports:
+      - "5123:80"
+    depends_on:
+      - backend
+
