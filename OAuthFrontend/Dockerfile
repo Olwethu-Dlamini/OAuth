@@ -1,28 +1,22 @@
-# Stage 1: Build & publish Blazor WASM
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+# --------------------------------------------------
+# Blazor WASM Production Dockerfile (AWS Optimized)
+# --------------------------------------------------
 
-WORKDIR /src
+# Use lightweight nginx image
+FROM nginx:alpine
 
-# Copy csproj and restore (caching layer)
-COPY *.csproj ./
-RUN dotnet restore
+# Remove default nginx static files
+RUN rm -rf /usr/share/nginx/html/*
 
-# Copy everything else and publish static files
-COPY . ./
-RUN dotnet publish -c Release -o /app/publish --no-restore
+# Copy pre-built Blazor publish output
+# (must exist locally before docker build)
+COPY ./bin/Release/net8.0/publish/wwwroot /usr/share/nginx/html
 
-# Stage 2: Serve static files with nginx
-FROM nginx:alpine AS final
-
-# Copy published wwwroot to nginx html folder
-COPY --from=build /app/publish/wwwroot /usr/share/nginx/html
-
-# Optional: custom nginx.conf if you need rewrites for SPA routing
-# (important for Blazor WASM client-side routing)
+# Copy custom nginx configuration (for SPA routing)
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Expose port 80
+# Expose HTTP port
 EXPOSE 80
 
-# Run nginx
+# Start nginx
 CMD ["nginx", "-g", "daemon off;"]
