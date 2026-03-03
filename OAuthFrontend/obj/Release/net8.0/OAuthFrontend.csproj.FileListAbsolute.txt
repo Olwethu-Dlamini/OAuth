@@ -1032,3 +1032,6 @@ C:\Users\olwethu\Desktop\OAuth\OAuthFrontend\obj\Release\net8.0\OAuthFrontend.dl
 C:\Users\olwethu\Desktop\OAuth\OAuthFrontend\obj\Release\net8.0\refint\OAuthFrontend.dll
 C:\Users\olwethu\Desktop\OAuth\OAuthFrontend\obj\Release\net8.0\OAuthFrontend.pdb
 C:\Users\olwethu\Desktop\OAuth\OAuthFrontend\obj\Release\net8.0\ref\OAuthFrontend.dll
+C:\Users\olwethu\Desktop\OAuth\OAuthFrontend\bin\Release\net8.0\publish\web.config
+C:\Users\olwethu\Desktop\OAuth\OAuthFrontend\bin\Release\net8.0\publish\wwwroot\sample-data\weather.json
+C:\Users\olwethu\Desktop\OAuth\OAuthFrontend\bin\Release\net8.0\publish\wwwroot\_framework\blazor.boot.json
